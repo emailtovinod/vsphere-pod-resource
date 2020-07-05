@@ -1,0 +1,56 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: rm-demo-app
+  name: rm-demo-app
+spec:
+  replicas: 1
+  selector:
+   matchLabels:
+     app: rm-demo-app
+  template:
+    metadata:
+      labels:
+        app: rm-demo-app
+    spec:
+      containers:
+      - env:
+        - name: my_pod_name
+          valueFrom:
+            fieldRef:
+              apiVersion: v1
+              fieldPath: metadata.name
+        - name: my_cpu_request
+          valueFrom:
+            resourceFieldRef:
+              divisor: 1m
+              resource: requests.cpu
+        - name: my_memory_request
+          valueFrom:
+            resourceFieldRef:
+              divisor: 1Mi
+              resource: requests.memory
+        - name: my_cpu_limit
+          valueFrom:
+            resourceFieldRef:
+              divisor: 1m
+              resource: limits.cpu
+        - name: my_memory_limit
+          valueFrom:
+            resourceFieldRef:
+              divisor: 1Mi
+              resource: limits.memory
+        image: quay.io/valex/rm-demo-php:v1
+        imagePullPolicy: IfNotPresent
+        name: rm-demo-app
+        ports:
+        - containerPort: 8080
+          protocol: TCP
+        - containerPort: 8443
+          protocol: TCP
+      dnsPolicy: ClusterFirst
+      restartPolicy: Always
+      schedulerName: default-scheduler
+      securityContext: {}
+      terminationGracePeriodSeconds: 30
